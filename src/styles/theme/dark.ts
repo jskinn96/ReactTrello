@@ -11,14 +11,14 @@ export const DarkMode: DefaultTheme = {
     txtColor        : "#f5f6fa",
     accentColor     : "#9c88ff",
     yellowColor     : "#facc15",
-    cardBg          : "#1E242D",                 // 깊은 네이비 블루
+    cardBg          : "#1E242D",                 
     cardShadow      : "rgba(0, 0, 0, 0.3)",
     cardHoverShadow : "rgba(0, 0, 0, 0.5)",
-    textPrimary     : "#f5f6fa",            // 밝은 흰색 톤
-    textSecondary   : "#A0AEC0",          // 부드러운 그레이
-    statusBorder    : "#9c88ff",           // 라벤더 유지
+    textPrimary     : "#f5f6fa",            
+    textSecondary   : "#A0AEC0",          
+    statusBorder    : "#9c88ff",          
     statusHoverBg   : "#9c88ff",
-    statusHoverText : "#1E242D",        // 대비 강조용
+    statusHoverText : "#1E242D",        
     actionText      : "#A0AEC0",
     actionHoverText : "#f5f6fa",
     royalblue       : "royalblue",

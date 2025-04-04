@@ -9,13 +9,22 @@ const Wrap = styled.div<{$is_dragging_over_from_this: string, $is_dragging_over:
     align-items: center;
     justify-content: center;
     position: fixed;
-    height: ${props =>
+    top: ${props =>
         props.$is_dragging_over_from_this === "false"
-        ? "0"
-        : "3.75rem"
+        ? "-3.75rem"
+        : "0"
+    };
+    width:  ${props =>
+        props.$is_dragging_over === "false"
+        ? "7.5rem"
+        : "9.5rem"
+    };
+    height: ${props =>
+        props.$is_dragging_over === "false"
+        ? "3.75rem"
+        : "4.75rem"
     };
     left: calc(-3.75rem + 50vw);
-    width: 7.5rem;
     border-radius: 0px 0px 100rem 100rem;
     background-color: ${props =>
         props.$is_dragging_over === "false"
@@ -25,7 +34,7 @@ const Wrap = styled.div<{$is_dragging_over_from_this: string, $is_dragging_over:
     box-shadow: rgba(210, 77, 77, 0.15) -0.1rem 0px 0.4rem;
     font-size: 2.5rem;
     z-index: 5;
-    transition: height 0.3s;
+    transition: .3s;
     overflow: hidden;
 
     & > svg {
@@ -40,7 +49,7 @@ const DeleteEl = () => {
     const isDrag = useRecoilValue(DragAtom);
 
     return (
-        <Droppable droppableId="trash">
+        <Droppable droppableId="trash" type="CARD">
             {(dropProps, snapshot) => (
                 <Wrap
                     ref={dropProps.innerRef}

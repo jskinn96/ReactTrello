@@ -8,6 +8,7 @@ export interface IToDo {
 export interface IBoard {
     type: string;
     toDos: IToDo[];
+    index: number
 }
 
 export interface IToDoAtom {
@@ -22,7 +23,7 @@ export const DragAtom = atom({
 export const ToDoAtom = atom<IToDoAtom>({
     key: "CToDoAtomKey",
     default: {
-        "To Do": [{text : "윤이", id : 0}],
+        "To Do": [],
         "Doing": [],
         "Done": [],
     }

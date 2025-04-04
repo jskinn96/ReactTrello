@@ -1,10 +1,12 @@
-import { Droppable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import Card from "./Card";
 import { IBoard, ToDoAtom } from "../recoil";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Pencil, Trash2, Move, PlusCircle } from 'lucide-react';
+import Swal from "sweetalert2";
+import { ThemeAtom } from "../../recoil";
 
 const BoardFuncWrap = styled.div`
     display: flex;
@@ -18,9 +20,20 @@ const BoardFuncWrap = styled.div`
     opacity: 0;
 `;
 
+const TitleWrap = styled.div`
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 600;
+    width: 100%;
+    height: 4.5rem;
+    padding: 1.25rem;
+    border-radius: 0.8rem 0.8rem 0px 0px;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, opacity 0.3s;
+`;
+
 const Wrap = styled.div`
     display: flex;
-    width: 16rem;
+    width: 20rem;
     height: fit-content;
     max-height: 100%;
     position: relative;
@@ -32,6 +45,11 @@ const Wrap = styled.div`
 
     &:hover ${BoardFuncWrap} {
         opacity: 1;
+        position: static;
+        flex: 1;
+    }
+    &:hover ${TitleWrap} {
+        display: flex;
     }
 `;
 
@@ -55,14 +73,10 @@ interface IBoardEl {
     $is_dragging_over_from_this: string;
 }
 
-const BoardEl = styled.ul<IBoardEl>`
-    display: flex;
-    flex-direction: column;
+const BoardEl = styled.div<IBoardEl>`
     padding: 4.5rem 1rem;
     width: 100%;
     max-height: calc(-20px + 100vh);
-    overflow: hidden auto;
-    gap: 0.6rem;
     background-color: ${props =>
         props.$is_dragging_over === "true"
             ? props.theme.royalblue
@@ -72,15 +86,13 @@ const BoardEl = styled.ul<IBoardEl>`
     };
 `;
 
-const TitleWrap = styled.div`
-    display: block;
-    font-size: 1.6rem;
-    font-weight: 600;
-    width: 16rem;
-    height: 4.5rem;
-    padding: 1.25rem;
-    border-radius: 0.8rem 0.8rem 0px 0px;
-    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, opacity 0.3s;
+const BoardLine = styled.ul`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden auto;
+    gap: 0.6rem;
 `;
 
 const Title = styled.h2`
@@ -106,6 +118,11 @@ const FuncButton = styled.button`
     color: rgb(173, 173, 173);
     transition: background-color 0.3s, color 0.3s, opacity 0.3s;
     cursor: pointer;
+    transition: .3s;
+
+    &:hover {
+        color: ${({ theme }) => theme.accentColor};
+    }
 `;
 
 interface IForm {
@@ -166,10 +183,11 @@ const SubmitBtn = styled.button`
     color: royalblue;
 `;
 
-const Board = ({ type, toDos }: IBoard) => {
+const Board = ({ type, toDos, index }: IBoard) => {
 
     const { register, setValue, handleSubmit } = useForm<IForm>();
     const setToDos = useSetRecoilState(ToDoAtom);
+    const selectTheme = useRecoilValue(ThemeAtom);
 
     const setValid = (val: IForm) => {
 
@@ -192,21 +210,94 @@ const Board = ({ type, toDos }: IBoard) => {
         setValue(type, "");
     }
 
+    const deleteBoard = async () => {
+
+        const confirm = await Swal.fire({
+            title: `Are you sure you want to delete this ${type}?`,
+            text: `All tasks under this ${type} will be deleted as well`,
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            theme: selectTheme,
+        });
+
+        if (confirm.isConfirmed) setToDos(prev => {
+
+            const tmp = { ...prev };
+            delete tmp[type];
+
+            return tmp;
+        });
+    }
+
+    const editBoard = async () => {
+
+        const newCatPrompt = await Swal.fire({
+            title: "Edit category name",
+            input: "text",
+            inputPlaceholder: "Enter new name",
+            inputValue: type,
+            showCancelButton: true,
+            confirmButtonText: "edit",
+            cancelButtonText: "cancel",
+            theme: selectTheme,
+        });
+
+        if (newCatPrompt.isConfirmed && newCatPrompt.value?.trim()) {
+
+            const newName = newCatPrompt.value.trim();
+
+            if (newName !== type) setToDos(prev => {
+
+                if (Object.prototype.hasOwnProperty.call(prev, newName)) {
+                    
+                    Swal.fire({
+                        title: "Error", 
+                        text: "Board name already exists!", 
+                        icon: "error",
+                        theme: selectTheme,
+                    });
+                    return prev;
+                }
+
+                const keyArray = Object.keys(prev);
+                const TGIdx = keyArray.findIndex(key => key === type);
+
+                const entries = Object.entries(prev);
+                const [moved] = entries.splice(TGIdx, 1);
+
+                moved[0] = newName;
+                entries.splice(TGIdx, 0, moved);
+
+                return Object.fromEntries(entries);
+            });
+        }
+    }
+
     return (
-        <Droppable droppableId={type}>
-            {(dropProps, snapshot) => (
-                <Wrap>
+        <Draggable draggableId={`${type}`} index={index}>
+            {(boardDragProps) => (
+                <Wrap
+                    ref={boardDragProps.innerRef}
+                    {...boardDragProps.draggableProps}
+                >
                     <FuncWrap>
                         <TitleWrap>
                             <Title>{type}</Title>
                             <BoardFuncWrap>
-                                <FuncButton>
+                                <FuncButton
+                                    onClick={editBoard}
+                                >
                                     <Pencil />
                                 </FuncButton>
-                                <FuncButton>
+                                <FuncButton
+                                    onClick={deleteBoard}
+                                >
                                     <Trash2 />
                                 </FuncButton>
-                                <FuncButton>
+                                <FuncButton
+                                    {...boardDragProps.dragHandleProps}
+                                >
                                     <Move />
                                 </FuncButton>
                             </BoardFuncWrap>
@@ -222,29 +313,37 @@ const Board = ({ type, toDos }: IBoard) => {
                             </SubmitBtn>
                         </Form>
                     </FuncWrap>
-                    <BoardEl
-                        ref={dropProps.innerRef}
-                        {...dropProps.droppableProps}
-                        $is_dragging_over={snapshot.isDraggingOver.toString()}
-                        $is_dragging_over_from_this={Boolean(snapshot.draggingFromThisWith).toString()}
-                    >
-                        {
-                            toDos.length > 0
-                                ? toDos.map((toDo, idx) => (
-                                    <Card
-                                        key={toDo.id}
-                                        toDo={toDo.text}
-                                        id={toDo.id}
-                                        idx={idx}
-                                    />
-                                ))
-                                : <EmptySpace>This board is empty.</EmptySpace>
-                        }
-                        {dropProps.placeholder}
-                    </BoardEl>
+                    <Droppable droppableId={type} type="CARD">
+                        {(dropProps, snapshot) => (
+                            <BoardEl
+                                ref={dropProps.innerRef}
+                                {...dropProps.droppableProps}
+                                $is_dragging_over={snapshot.isDraggingOver.toString()}
+                                $is_dragging_over_from_this={Boolean(snapshot.draggingFromThisWith).toString()}
+                                className="BoardEl"
+                            >
+                                <BoardLine>
+                                    {
+                                        toDos.length > 0
+                                            ? toDos.map((toDo, idx) => (
+                                                <Card
+                                                    key={toDo.id}
+                                                    toDo={toDo.text}
+                                                    id={toDo.id}
+                                                    idx={idx}
+                                                />
+                                            ))
+                                            : <EmptySpace>This board is empty.</EmptySpace>
+                                    }
+                                </BoardLine>
+                                {dropProps.placeholder}
+                            </BoardEl>
+                        )}
+                    </Droppable>
                 </Wrap>
+
             )}
-        </Droppable>
+        </Draggable>
     );
 }
 

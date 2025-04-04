@@ -1,10 +1,12 @@
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { DragAtom, IToDoAtom, ToDoAtom } from "./trello/recoil";
+import { IToDoAtom, ToDoAtom } from "./trello/recoil";
 import Board from "./trello/components/Board";
 import Header from "./trello/components/Header";
 import DeleteEl from "./trello/components/Delete";
+import { useEffect } from "react";
+import { useDragHandlers } from "./hooks/useDragHandlers";
 
 const Body = styled.div`
   height: 100vh;
@@ -26,87 +28,46 @@ const Wrap = styled.main`
 function App() {
 
   const [toDos, setToDos] = useRecoilState<IToDoAtom>(ToDoAtom);
-  const setIsDrag = useSetRecoilState<boolean>(DragAtom);
-  
-  const dragStartFunc = () => {
+  const { dragStartFunc, dragEndFunc } = useDragHandlers();
 
-    setIsDrag(true);
-  }
+  useEffect(() => {
 
-  const dragEndFunc = ({ destination, source }: DropResult) => {
+    const savedToDos = localStorage.getItem("toDos") as string;
+    if (savedToDos) setToDos(JSON.parse(savedToDos));
+  }, []);
 
-    setIsDrag(false);
+  useEffect(() => {
 
-    if (!destination) return; 
-
-    if (destination?.droppableId === source.droppableId) {
-
-      setToDos(allBoards => {
-
-        const tmp = { ...allBoards };
-
-        const copied = [...allBoards[source.droppableId]];
-        const [moved] = copied.splice(source.index, 1);
-
-        copied.splice(destination.index, 0, moved);
-
-        tmp[source.droppableId] = copied;
-
-        return tmp;
-      });
-      
-    } else if (destination?.droppableId === "trash") {
-
-      setToDos(allBoards => {
-
-        const tmp = { ...allBoards };
-
-        const copied = [...allBoards[source.droppableId]];
-        copied.splice(source.index, 1);
-
-        tmp[source.droppableId] = copied;
-        
-        return tmp;
-    });
-
-    } else {
-
-      setToDos(allBoards => {
-
-        const tmp = { ...allBoards };
-
-        const current = [...allBoards[source.droppableId]];
-        const target = [...allBoards[destination.droppableId]];
-
-        const [moved] = current.splice(source.index, 1);
-        target.splice(destination.index, 0, moved);
-
-        tmp[source.droppableId] = current;
-        tmp[destination.droppableId] = target;
-
-        return tmp;
-      });
-    }
-  };
+    localStorage.setItem("toDos", JSON.stringify(toDos));
+  }, [toDos]);
 
   return (
     <Body>
       <Header />
       <DragDropContext
-        onDragStart={dragStartFunc} 
+        onDragStart={dragStartFunc}
         onDragEnd={dragEndFunc}
       >
-        <Wrap>
-          {
-            Object.keys(toDos).map(type => (
-              <Board
-                type={type}
-                toDos={toDos[type]}
-                key={type}
-              />
-            ))
-          }
-        </Wrap>
+        <Droppable droppableId="board" direction="horizontal" type="BOARD">
+          {(dropProps) => (
+            <Wrap
+              ref={dropProps.innerRef}
+              {...dropProps.droppableProps}
+            >
+              {
+                Object.keys(toDos).map((type, idx) => (
+                  <Board
+                    type={type}
+                    toDos={toDos[type]}
+                    key={type}
+                    index={idx}
+                  />
+                ))
+              }
+              {dropProps.placeholder}
+            </Wrap>
+          )}
+        </Droppable>
         <DeleteEl />
       </DragDropContext>
     </Body>

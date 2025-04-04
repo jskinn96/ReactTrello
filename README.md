@@ -1,54 +1,40 @@
-# React + TypeScript + Vite
+## 🚀 프로젝트 소개
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+감성과 기능, 둘 다 포기하지 않은  
+**드래그 앤 드롭 기반의 칸반 보드 프로젝트**입니다.
 
-Currently, two official plugins are available:
+- 💡 직관적인 UI / UX
+- 🎨 감성 styled-components 테마 적용
+- 💾 Recoil 상태관리 + LocalStorage 저장
+- 🧠 Board / Card 이동 완벽 구현
+- 🧹 Drag Type 분리 (BOARD vs CARD)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🧰 사용 기술
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React + TypeScript**
+- **Recoil**
+- **react-beautiful-dnd**
+- **styled-components**
+- **SweetAlert2**
+- **Lucide Icons**
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📦 주요 기능
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| 기능 | 설명 |
+|------|------|
+| 📋 보드 추가 / 수정 / 삭제 | 보드 이름 편집, 삭제 시 모든 카드도 제거 |
+| 🗂️ 카드 추가 / 수정 / 삭제 | 카드마다 고유 ID, 편집/삭제 기능 |
+| 🔀 드래그 앤 드롭 | 보드 간 이동, 카드 간 이동, 드래그 타입 분리 |
+| 🗑️ 카드 삭제 영역 | 드래그하여 휴지통 영역으로 이동 시 삭제 |
+| 🌗 다크모드, 라이트모드 테마 | 로컬스토리지 연동된 테마 스위치 |
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+---
+
+## 🧠 상태 관리 구조
+📦 Recoil 
+┣ 📄 ToDoAtom // 전체 보드 + 카드 상태 
+┗ 📄 DragAtom // 드래그 상태 추적용 (카드만 드래그 구분)
