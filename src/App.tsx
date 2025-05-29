@@ -10,7 +10,7 @@ import { useDragHandlers } from "./hooks/useDragHandlers";
 
 const Body = styled.div`
   height: 100vh;
-  overflow: hidden;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
 `;

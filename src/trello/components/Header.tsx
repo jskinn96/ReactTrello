@@ -16,7 +16,8 @@ const Wrap = styled.div`
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px;
     z-index: 1;
     position: sticky;
-    top: 0px;
+    top: 0;
+    left: 0;
 `;
 
 const TitleWrap = styled.div`
