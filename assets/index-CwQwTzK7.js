@@ -467,7 +467,8 @@ https://sweetalert2.github.io/#ajax-request`),dM(e),typeof e.title=="string"&&(e
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px;
     z-index: 1;
     position: sticky;
-    top: 0px;
+    top: 0;
+    left: 0;
 `,aB=ft.div`
     display: flex;
     align-items: flex-start;
@@ -522,7 +523,7 @@ https://sweetalert2.github.io/#ajax-request`),dM(e),typeof e.title=="string"&&(e
     }
 `,fB=()=>{const e=cs(Ib);return _e.jsx(_u,{droppableId:"trash",type:"CARD",children:(t,n)=>_e.jsxs(dB,{ref:t.innerRef,...t.droppableProps,$is_dragging_over_from_this:e.toString(),$is_dragging_over:n.isDraggingOver.toString(),children:[t.placeholder,_e.jsx(Vp,{})]})})},pB=()=>{const e=iu(Ib),t=iu(ds);return{dragStartFunc:({source:s})=>{s.droppableId!=="board"&&e(!0)},dragEndFunc:({destination:s,source:l})=>{e(!1),s&&((s==null?void 0:s.droppableId)==="board"?t(c=>{const d=Object.entries(c),[v]=d.splice(l.index,1);return d.splice(s.index,0,v),Object.fromEntries(d)}):(s==null?void 0:s.droppableId)===l.droppableId?t(c=>{const d={...c},v=[...c[l.droppableId]],[g]=v.splice(l.index,1);return v.splice(s.index,0,g),d[l.droppableId]=v,d}):(s==null?void 0:s.droppableId)==="trash"?t(c=>{const d={...c},v=[...c[l.droppableId]];return v.splice(l.index,1),d[l.droppableId]=v,d}):t(c=>{const d={...c},v=[...c[l.droppableId]],g=[...c[s.droppableId]],[y]=v.splice(l.index,1);return g.splice(s.index,0,y),d[l.droppableId]=v,d[s.droppableId]=g,d}))}}},vB=ft.div`
   height: 100vh;
-  overflow: hidden;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
 `,hB=ft.main`
